@@ -234,8 +234,13 @@ public class Game {
 
     private void populatePile() {
         for (int x = this.pileSize; x > 0; x--) {
-            this.A.push(x);
+            this.A.push(new Random().nextInt(100 + 1));
         }
+        System.out.print("Randomized:");
+        this.A.show();
+        orderPile(this.A);
+        System.out.print("Sorted:");
+        this.A.show();
     }
 
     private void printRods() {
@@ -275,12 +280,35 @@ public class Game {
         return this.gameOrder == -1 ? (value < destination) : (value > destination);
     }
 
+    public Boolean matchesByGameOrder(Integer x, Integer y) {
+        return this.gameOrder == -1 ? (x < y) : (x > y);
+    }
+
     private int[] symmetricalIDS() {
         int[] res = new int[this.pileSize];
         for(int x = 0; x < this.pileSize; x++) {
             res[x] = 0;
         }
         return res;
+    }
+
+    private void orderPile(Pile pile) {
+        Integer[] aux = new Integer[this.pileSize];
+        boolean isSorted = false;
+        for(int x = 0; x < this.pileSize; x++) aux[x] = (int)pile.pop();
+        while(!isSorted) {
+            isSorted = true;
+            for(int x = 0; x < this.pileSize-1; x++){
+                if(matchesByGameOrder(aux[x], aux[x+1])) {
+                    int _x = aux[x];
+                    int _y = aux[x+1];
+                    aux[x] = _y;
+                    aux[x+1] = _x;
+                    isSorted = false;
+                }
+            }
+        }
+        for(Integer i : aux) pile.push(i);
     }
 
     private Boolean areTheSame(Integer x, Integer last) {

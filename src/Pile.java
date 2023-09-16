@@ -31,7 +31,7 @@ public class Pile {
 
         this.head = this.head.getNext();
 
-        System.out.println(value);
+//        System.out.println(value);
         return value;
     }
 
