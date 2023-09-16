@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.lang.Thread;
 
 public class Game {
     private int pileSize = 0;
@@ -24,6 +25,14 @@ public class Game {
 
     public void start() {
         this.GameLoop();
+    }
+
+
+//    merdamerdamerdamerdamerdamerda
+    public void timeDelay(long t) {
+        try {
+            Thread.sleep(t);
+        } catch (InterruptedException e) {}
     }
 
     private void GameLoop() {
@@ -146,12 +155,19 @@ public class Game {
         Integer nnPeek = (Integer) rods[nextNextIndex].peek();
 
         while(!this.checkWin()) {
+
+            this.printRods();
+            System.out.println(currIndex);
+
+//            timeDelay(1000);
+
             nextIndex = ni[currIndex];
             nextNextIndex = nni[currIndex];
 
 //            System.out.println("Resolved in " + this.moves + " moves.");
 //            printRods();
             if(current.isEmpty()) {
+                System.out.println("isEmpty");
                 currIndex = nextIndex;
                 current = rods[currIndex];
                 continue;
@@ -161,24 +177,39 @@ public class Game {
             nPeek = (Integer) rods[nextIndex].peek();
             nnPeek = (Integer) rods[nextNextIndex].peek();
 
-            if(areTheSame(cPeek, nPeek, lastMoved)) {
+            if(areTheSame(cPeek, lastMoved)) {
                 currIndex = nextIndex;
                 current = rods[currIndex];
                 continue;
             }
 
             if(isMoveValid(cPeek, nPeek)) {
-                rods[nextIndex].push((int)current.pop());
-                lastMoved = currIndex;
+//                if(nPeek == null){
+//                    if (isMoveValid(cPeek, nnPeek)) {
+//                        //next next do c tem q ser engual a B nao A
+//                        int x = (int) current.pop();
+//                        rods[nextNextIndex].push(x);
+//                        lastMoved = cPeek;
+//                        currIndex = nextIndex;
+//                        current = rods[currIndex];
+//                        this.moves++;
+//                        continue;
+//                    }
+//                }
+                int x = (int)current.pop();
+                rods[nextIndex].push(x);
+                lastMoved = cPeek;
+                this.moves++;
             } else if (isMoveValid(cPeek, nnPeek)) {
                 //next next do c tem q ser engual a B nao A
-                rods[nextNextIndex].push((int)current.pop());
-                lastMoved = currIndex;
+                int x = (int)current.pop();
+                rods[nextNextIndex].push(x);
+                lastMoved = cPeek;
+                this.moves++;
             }
 
             currIndex = nextIndex;
             current = rods[currIndex];
-            this.moves++;
         }
 
         System.out.println("Resolved in " + this.moves + " moves.");
@@ -198,12 +229,12 @@ public class Game {
     }
 
     private Boolean checkWin() {
-        return this.A.isEmpty() && this.B.isEmpty();
+        return ((this.A.isEmpty() && this.B.isEmpty()) || (this.A.isEmpty() && this.C.isEmpty()));
     }
 
     private void populatePile() {
-        for (int x = 0; x < this.pileSize; x++) {
-            this.A.push(new Random().nextInt(100 + 1));
+        for (int x = this.pileSize; x > 0; x--) {
+            this.A.push(x);
         }
     }
 
@@ -238,11 +269,12 @@ public class Game {
     }
 
     public Boolean isMoveValid(Integer value, Integer destination) {
-        System.out.println("PORRA:" + (destination == null) + " : " + destination);
+//        System.out.println("PORRA:" + (destination == null) + " : " + destination);
         if((destination == null)) return true;
         if(destination == 0) return true;
         return this.gameOrder == -1 ? (value < destination) : (value > destination);
     }
+
     private int[] symmetricalIDS() {
         int[] res = new int[this.pileSize];
         for(int x = 0; x < this.pileSize; x++) {
@@ -251,20 +283,20 @@ public class Game {
         return res;
     }
 
-    private Boolean areTheSame(Integer x, Integer y, Integer last) {
+    private Boolean areTheSame(Integer x, Integer last) {
         if(last == null) return false;
-        x = x == null ? 0 : x;
-        y = y == null ? 1 : y;
+//        x = x == null ? 0 : x;
+//        y = y == null ? 1 : y;
 //        last = last == null ? 0 : last;
         // x é quem eu to mexendo no momento
         // y é a cabeca da pilha pra quem eu to enviando x
         // last é o valor da ultima peca mexida
 //        if(!x.equals(last)) return false;
-        if(y.equals(last)) {
-            return false;
+        if(x.equals(last)) {
+            return true;
         }
         else {
-            return true;
+            return false;
         }
 //        ! (x == last && y == last)
 //        x !== last && y == last
