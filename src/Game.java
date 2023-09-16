@@ -74,7 +74,6 @@ public class Game {
         this.setGameOrder(scan.nextInt());
 
         this.populatePile();
-        this.printRods();
 
         System.out.println("Escolhe bem gostoso, do jeito que manuelgome gosta:");
         System.out.println("[0] Paia (sai do gayme)");
@@ -236,11 +235,8 @@ public class Game {
         for (int x = this.pileSize; x > 0; x--) {
             this.A.push(new Random().nextInt(100 + 1));
         }
-        System.out.print("Randomized:");
-        this.A.show();
+        this.printRods();
         orderPile(this.A);
-        System.out.print("Sorted:");
-        this.A.show();
     }
 
     private void printRods() {
