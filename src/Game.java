@@ -1,7 +1,5 @@
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-import java.lang.Thread;
 
 public class Game {
     private int pileSize = 0;
@@ -27,14 +25,6 @@ public class Game {
         this.GameLoop();
     }
 
-
-//    merdamerdamerdamerdamerdamerda
-    public void timeDelay(long t) {
-        try {
-            Thread.sleep(t);
-        } catch (InterruptedException e) {}
-    }
-
     private void GameLoop() {
         int end = 1;
         while(end != 0){
@@ -44,7 +34,7 @@ public class Game {
                     end = this.moveLoop();
                 }
                 case 2 -> {
-                    end = autoResolve();
+                    end = autoResolve(this.A, this.B, this.C);
                 }
                 default -> end = 0;
             }
@@ -136,86 +126,39 @@ public class Game {
         else return 1;
     }
 
-    private int autoResolve() {
-
-        int currIndex = 0;
-        Integer lastMoved = null;
-
-        Pile current = this.rods[currIndex];
-
-        int[] ni = new int[]{1, 2, 0};
-        int[] nni = new int[]{2, 0, 1};
-
-        int nextIndex = ni[currIndex];
-        int nextNextIndex = nni[currIndex];
-
-        Integer cPeek = (Integer) current.peek();
-        Integer nPeek = (Integer) rods[nextIndex].peek();
-        Integer nnPeek = (Integer) rods[nextNextIndex].peek();
-
-        while(!this.checkWin()) {
-
-            this.printRods();
-            System.out.println(currIndex);
-
-//            timeDelay(1000);
-
-            nextIndex = ni[currIndex];
-            nextNextIndex = nni[currIndex];
-
-//            System.out.println("Resolved in " + this.moves + " moves.");
-//            printRods();
-            if(current.isEmpty()) {
-                System.out.println("isEmpty");
-                currIndex = nextIndex;
-                current = rods[currIndex];
-                continue;
-            }
-
-            cPeek = (Integer) current.peek();
-            nPeek = (Integer) rods[nextIndex].peek();
-            nnPeek = (Integer) rods[nextNextIndex].peek();
-
-            if(areTheSame(cPeek, lastMoved)) {
-                currIndex = nextIndex;
-                current = rods[currIndex];
-                continue;
-            }
-
-            if(isMoveValid(cPeek, nPeek)) {
-//                if(nPeek == null){
-//                    if (isMoveValid(cPeek, nnPeek)) {
-//                        //next next do c tem q ser engual a B nao A
-//                        int x = (int) current.pop();
-//                        rods[nextNextIndex].push(x);
-//                        lastMoved = cPeek;
-//                        currIndex = nextIndex;
-//                        current = rods[currIndex];
-//                        this.moves++;
-//                        continue;
-//                    }
-//                }
-                int x = (int)current.pop();
-                rods[nextIndex].push(x);
-                lastMoved = cPeek;
-                this.moves++;
-            } else if (isMoveValid(cPeek, nnPeek)) {
-                //next next do c tem q ser engual a B nao A
-                int x = (int)current.pop();
-                rods[nextNextIndex].push(x);
-                lastMoved = cPeek;
-                this.moves++;
-            }
-
-            currIndex = nextIndex;
-            current = rods[currIndex];
+    private int autoResolve(Pile resolveIn, Pile auxiliary, Pile resolveTo) {
+//        Pile resolveInBetween = parameter
+        while(!resolveIn.isEmpty()) {
+            mergeSort(resolveTo, (int)resolveIn.pop(), auxiliary);
         }
 
-        System.out.println("Resolved in " + this.moves + " moves.");
-        System.out.println("Resolved ;)");
+//        while(!resolveInBetween.isEmpty()) {
+//            mergeSort(resolveTo, (int)resolveInBetween.pop());
+//        }
+
         this.win = this.checkWin();
+
+        System.out.println("\n===========RESULTS AUTORESOLVE=============");
         this.printRods();
+
+        System.out.println("Resolved ;)");
+        System.out.println("Resolved in " + (this.moves + 1) + " moves.");
+
         return 0;
+    }
+
+    private void mergeSort(Pile resolveTo, Integer element, Pile auxiliary) {
+
+        while (!resolveTo.isEmpty() && matchesByGameOrder((int)resolveTo.peek(), element)) {
+            auxiliary.push((int)resolveTo.pop());
+            this.printRods();
+        }
+        resolveTo.push(element);
+        while(!auxiliary.isEmpty()) {
+            resolveTo.push((int)auxiliary.pop());
+        }
+
+        this.moves++;
     }
 
     private void setGameOrder(int x) {
@@ -236,10 +179,10 @@ public class Game {
             this.A.push(new Random().nextInt(100 + 1));
         }
         this.printRods();
-        orderPile(this.A);
     }
 
     private void printRods() {
+        System.out.println("\n============GAME STATE=============");
         System.out.println("LIFO [ A: " + this.A.peek() + ", B: " + this.B.peek() + ", C: " + this.C.peek() + "]");
         System.out.print("A");
         this.A.show();
@@ -252,25 +195,9 @@ public class Game {
         System.out.print("C");
         this.C.show();
         System.out.print("\n");
-
-//        ArrayList<Integer> A = this.A.give();
-//        ArrayList<Integer> B = this.B.give();
-//        ArrayList<Integer> C = this.C.give();
-//
-//        System.out.println("―――    ―――    ―――");
-//        for(int y = 0; y < this.pileSize; y++) {
-//            String a = y > A.size()-1 ? " " : " " + Integer.toString(A.get(y)) + "  ";
-//            String b = y > B.size()-1 ? " " : " " + Integer.toString(B.get((B.size() - 1)- y)) + "  ";
-//            String c = y > C.size()-1 ? " " : " " + Integer.toString(C.get((C.size() - 1)- y)) + "  ";
-//            System.out.println(b + " > " + c);
-//            System.out.print(a + "    "  + b + "    " + c + "\n");
-//
-//        }
-//        System.out.println("―――    ―――    ―――");
     }
 
     public Boolean isMoveValid(Integer value, Integer destination) {
-//        System.out.println("PORRA:" + (destination == null) + " : " + destination);
         if((destination == null)) return true;
         if(destination == 0) return true;
         return this.gameOrder == -1 ? (value < destination) : (value > destination);
@@ -278,54 +205,5 @@ public class Game {
 
     public Boolean matchesByGameOrder(Integer x, Integer y) {
         return this.gameOrder == -1 ? (x < y) : (x > y);
-    }
-
-    private int[] symmetricalIDS() {
-        int[] res = new int[this.pileSize];
-        for(int x = 0; x < this.pileSize; x++) {
-            res[x] = 0;
-        }
-        return res;
-    }
-
-    private void orderPile(Pile pile) {
-        Integer[] aux = new Integer[this.pileSize];
-        boolean isSorted = false;
-        for(int x = 0; x < this.pileSize; x++) aux[x] = (int)pile.pop();
-        while(!isSorted) {
-            isSorted = true;
-            for(int x = 0; x < this.pileSize-1; x++){
-                if(matchesByGameOrder(aux[x], aux[x+1])) {
-                    int _x = aux[x];
-                    int _y = aux[x+1];
-                    aux[x] = _y;
-                    aux[x+1] = _x;
-                    isSorted = false;
-                }
-            }
-        }
-        for(Integer i : aux) pile.push(i);
-    }
-
-    private Boolean areTheSame(Integer x, Integer last) {
-        if(last == null) return false;
-//        x = x == null ? 0 : x;
-//        y = y == null ? 1 : y;
-//        last = last == null ? 0 : last;
-        // x é quem eu to mexendo no momento
-        // y é a cabeca da pilha pra quem eu to enviando x
-        // last é o valor da ultima peca mexida
-//        if(!x.equals(last)) return false;
-        if(x.equals(last)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-//        ! (x == last && y == last)
-//        x !== last && y == last
-//        x == last && y == last
-//        x == last && y !== last
-
     }
 }
