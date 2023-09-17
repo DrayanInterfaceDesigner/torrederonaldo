@@ -149,6 +149,10 @@ public class Game {
 
     private void mergeSort(Pile resolveTo, Integer element, Pile auxiliary) {
 
+        //Known problem to accurately reproduce the steps
+        //To be honest, we've made this in pseudo-code before.
+        //There, things work, but here, for some reason, the
+        //steps aren't working accurately.
         while (!resolveTo.isEmpty() && matchesByGameOrder((int)resolveTo.peek(), element)) {
             auxiliary.push((int)resolveTo.pop());
             this.printRods();
@@ -156,8 +160,8 @@ public class Game {
         resolveTo.push(element);
         while(!auxiliary.isEmpty()) {
             resolveTo.push((int)auxiliary.pop());
+            this.printRods();
         }
-
         this.moves++;
     }
 
